@@ -12,21 +12,13 @@ public class ModCompat {
     public static final boolean HAS_IMMEDIATELYFAST;
     public static final boolean HAS_ENTITYCULLING;
 
-    public static final boolean DISABLED_CULLING;
-    public static final boolean DISABLED_FOG;
-    public static final boolean DISABLED_SKY;
-
     static {
         HAS_SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
         HAS_IRIS = FabricLoader.getInstance().isModLoaded("iris");
         HAS_IMMEDIATELYFAST = FabricLoader.getInstance().isModLoaded("immediatelyfast");
         HAS_ENTITYCULLING = FabricLoader.getInstance().isModLoaded("entityculling");
 
-        DISABLED_CULLING = HAS_SODIUM;
-        DISABLED_FOG = HAS_SODIUM || HAS_IRIS;
-        DISABLED_SKY = HAS_IRIS;
-
-        if (HAS_SODIUM) LOGGER.info("Sodium обнаружен — отключаю чанковый каллинг OptiVisual (Sodium делает свой)");
-        if (HAS_IRIS) LOGGER.info("Iris обнаружен — отключаю туман/небо OptiVisual (Iris контролирует их)");
+        if (HAS_SODIUM) LOGGER.info("Sodium обнаружен — OptiVisual работает в режиме совместимости");
+        if (HAS_IRIS) LOGGER.info("Iris обнаружен — туман/небо OptiVisual через Iris");
     }
 }

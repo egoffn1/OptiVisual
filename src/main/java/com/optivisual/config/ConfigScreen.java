@@ -16,6 +16,13 @@ public class ConfigScreen {
 
         ConfigEntryBuilder e = builder.entryBuilder();
 
+        if (ModCompat.HAS_SODIUM) {
+            builder.getOrCreateCategory(Text.literal("Совместимость"))
+                .addEntry(e.startTextDescription(
+                    Text.literal("Sodium: всё работает. Fog/color через BackgroundRenderer, дистанция через options.")
+                ).build());
+        }
+
         ConfigCategory visual = builder.getOrCreateCategory(Text.literal("Визуал"));
 
         visual.addEntry(e.startFloatField(Text.literal("Яркость"), config.brightness)
@@ -45,15 +52,9 @@ public class ConfigScreen {
 
         ConfigCategory fog = builder.getOrCreateCategory(Text.literal("Туман"));
 
-        if (ModCompat.DISABLED_FOG) {
-            fog.addEntry(e.startTextDescription(
-                Text.literal("⚠ Sodium/Iris: настройки тумана отключены для совместимости")
-            ).build());
-        }
-
         fog.addEntry(e.startBooleanToggle(Text.literal("Кастомный туман"), config.customFog)
             .setDefaultValue(false)
-            .setTooltip(Text.literal("Включить свои настройки тумана"))
+            .setTooltip(Text.literal("Включить свои настройки тумана (работает с Sodium)"))
             .setSaveConsumer(v -> { config.customFog = v; config.preset = "custom"; }).build());
 
         fog.addEntry(e.startFloatField(Text.literal("Дальность тумана"), config.fogDistance)
@@ -73,19 +74,19 @@ public class ConfigScreen {
 
         ConfigCategory culling = builder.getOrCreateCategory(Text.literal("Оптимизация рендера"));
 
-        if (ModCompat.DISABLED_CULLING) {
+        if (ModCompat.HAS_SODIUM) {
             culling.addEntry(e.startTextDescription(
-                Text.literal("⚠ Sodium: каллинг управляется Sodium. Опции ниже могут не работать.")
+                Text.literal("Sodium управляет каллингом чанков. Настройки ниже работают только если Sodium не заменяет BuiltChunkStorage.")
             ).build());
         }
 
         culling.addEntry(e.startBooleanToggle(Text.literal("Каллинг сзади камеры"), config.behindCulling)
             .setDefaultValue(true)
-            .setTooltip(Text.literal("Не рендерить чанки позади камеры"))
+            .setTooltip(Text.literal("Не рендерить чанки позади камеры. Если Sodium — может не работать."))
             .setSaveConsumer(v -> { config.behindCulling = v; config.preset = "custom"; }).build());
 
         culling.addEntry(e.startIntField(Text.literal("Макс. дистанция рендера (чанки)"), config.maxRenderDistance)
-            .setDefaultValue(16).setMin(2).setMax(32)
+            .setDefaultValue(12).setMin(2).setMax(32)
             .setTooltip(Text.literal("Максимальная дистанция (в чанках)"))
             .setSaveConsumer(v -> { config.maxRenderDistance = v; config.preset = "custom"; }).build());
 
@@ -93,11 +94,11 @@ public class ConfigScreen {
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Авто-оптимизация"), config.autoOptimize)
             .setDefaultValue(true)
-            .setTooltip(Text.literal("Автоматически подбирать настройки под железо"))
+            .setTooltip(Text.literal("Автоматически подбирать дистанцию рендера и туман под FPS"))
             .setSaveConsumer(v -> { config.autoOptimize = v; config.preset = "custom"; }).build());
 
         perf.addEntry(e.startIntField(Text.literal("Целевой FPS"), config.targetFPS)
-            .setDefaultValue(60).setMin(15).setMax(999)
+            .setDefaultValue(150).setMin(15).setMax(999)
             .setTooltip(Text.literal("Целевое значение FPS для авто-настроек"))
             .setSaveConsumer(v -> { config.targetFPS = v; config.preset = "custom"; }).build());
 
@@ -106,13 +107,18 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Авто-подстройка дистанции прорисовки под FPS"))
             .setSaveConsumer(v -> { config.dynamicRenderDistance = v; config.preset = "custom"; }).build());
 
+        perf.addEntry(e.startBooleanToggle(Text.literal("Динам. плотность тумана"), config.dynamicFogDistance)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Снижать дальность тумана при низком FPS для ускорения"))
+            .setSaveConsumer(v -> { config.dynamicFogDistance = v; config.preset = "custom"; }).build());
+
         perf.addEntry(e.startIntField(Text.literal("Мин. дистанция рендера"), config.minRenderDistance)
-            .setDefaultValue(4).setMin(2).setMax(32)
+            .setDefaultValue(2).setMin(2).setMax(32)
             .setTooltip(Text.literal("Минимальная дистанция (в чанках)"))
             .setSaveConsumer(v -> { config.minRenderDistance = v; config.preset = "custom"; }).build());
 
         perf.addEntry(e.startIntField(Text.literal("Макс. дистанция рендера"), config.maxRenderDistance)
-            .setDefaultValue(16).setMin(2).setMax(32)
+            .setDefaultValue(12).setMin(2).setMax(32)
             .setTooltip(Text.literal("Максимальная дистанция (в чанках)"))
             .setSaveConsumer(v -> { config.maxRenderDistance = v; config.preset = "custom"; }).build());
 
@@ -123,7 +129,7 @@ public class ConfigScreen {
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Время прорисовки чанков"), config.showChunkRenderTime)
             .setDefaultValue(false)
-            .setTooltip(Text.literal("Показывать время рендера чанков (мс)"))
+            .setTooltip(Text.literal("Показывать время рендера чанков (мс). С Sodium может не работать."))
             .setSaveConsumer(v -> { config.showChunkRenderTime = v; config.preset = "custom"; }).build());
 
         ConfigCategory presets = builder.getOrCreateCategory(Text.literal("Пресеты"));
@@ -133,7 +139,7 @@ public class ConfigScreen {
             new String[]{"low", "mid", "high", "ultra", "balanced", "custom"},
             config.preset
         ).setDefaultValue("balanced")
-            .setTooltip(Text.literal("low — макс. FPS\nmid — сбалансированно\nhigh — красиво\nultra — максимальное качество\nbalanced — авто\ncustom — свои настройки"))
+            .setTooltip(Text.literal("low — макс. FPS (150+)\nmid — сбалансированно\nhigh — красиво\nultra — максимальное качество\nbalanced — авто\ncustom — свои настройки"))
             .setSaveConsumer(v -> {
                 ConfigManager.applyPreset(v);
             }).build());

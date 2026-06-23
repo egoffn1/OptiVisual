@@ -55,44 +55,50 @@ public class ConfigManager {
                 config.contrast = 0.9f;
                 config.saturation = 0.8f;
                 config.gamma = 0.8f;
-                config.fogDistance = 0.3f;
-                config.fogDensity = 1.2f;
+                config.fogDistance = 0.15f;
+                config.fogDensity = 1.5f;
                 config.customFog = true;
-                config.renderDistanceScale = 0.5f;
+                config.renderDistanceScale = 0.3f;
                 config.smoothLighting = false;
                 config.fogColorBoost = false;
                 config.smartCulling = true;
                 config.behindCulling = true;
-                config.lodDistance = 32;
+                config.lodDistance = 16;
                 config.dynamicRenderDistance = true;
+                config.dynamicFogDistance = true;
                 config.minRenderDistance = 2;
-                config.maxRenderDistance = 8;
+                config.maxRenderDistance = 6;
+                config.targetFPS = 150;
+                config.autoOptimize = true;
             }
             case "mid" -> {
                 config.brightness = 1.0f;
                 config.contrast = 1.0f;
                 config.saturation = 1.0f;
                 config.gamma = 1.0f;
-                config.fogDistance = 0.7f;
+                config.fogDistance = 0.5f;
                 config.fogDensity = 1.0f;
-                config.customFog = false;
-                config.renderDistanceScale = 0.75f;
+                config.customFog = true;
+                config.renderDistanceScale = 0.6f;
                 config.smoothLighting = true;
                 config.fogColorBoost = false;
                 config.smartCulling = true;
                 config.behindCulling = true;
-                config.lodDistance = 48;
+                config.lodDistance = 32;
                 config.dynamicRenderDistance = true;
+                config.dynamicFogDistance = true;
                 config.minRenderDistance = 4;
-                config.maxRenderDistance = 12;
+                config.maxRenderDistance = 10;
+                config.targetFPS = 120;
+                config.autoOptimize = true;
             }
             case "high" -> {
                 config.brightness = 1.0f;
                 config.contrast = 1.05f;
                 config.saturation = 1.1f;
                 config.gamma = 1.05f;
-                config.fogDistance = 1.2f;
-                config.fogDensity = 0.8f;
+                config.fogDistance = 1.0f;
+                config.fogDensity = 0.9f;
                 config.customFog = true;
                 config.renderDistanceScale = 1.0f;
                 config.smoothLighting = true;
@@ -101,8 +107,11 @@ public class ConfigManager {
                 config.behindCulling = true;
                 config.lodDistance = 64;
                 config.dynamicRenderDistance = false;
+                config.dynamicFogDistance = false;
                 config.minRenderDistance = 8;
-                config.maxRenderDistance = 24;
+                config.maxRenderDistance = 18;
+                config.targetFPS = 60;
+                config.autoOptimize = false;
             }
             case "ultra" -> {
                 config.brightness = 1.0f;
@@ -119,8 +128,11 @@ public class ConfigManager {
                 config.behindCulling = false;
                 config.lodDistance = 128;
                 config.dynamicRenderDistance = false;
+                config.dynamicFogDistance = false;
                 config.minRenderDistance = 12;
                 config.maxRenderDistance = 32;
+                config.targetFPS = 30;
+                config.autoOptimize = false;
             }
             case "custom" -> {
             }
@@ -139,8 +151,11 @@ public class ConfigManager {
                 config.behindCulling = true;
                 config.lodDistance = 64;
                 config.dynamicRenderDistance = true;
-                config.minRenderDistance = 4;
-                config.maxRenderDistance = 16;
+                config.dynamicFogDistance = true;
+                config.minRenderDistance = 2;
+                config.maxRenderDistance = 12;
+                config.targetFPS = 150;
+                config.autoOptimize = true;
             }
         }
         config.preset = name;

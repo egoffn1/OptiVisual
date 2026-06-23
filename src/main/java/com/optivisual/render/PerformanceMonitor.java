@@ -10,25 +10,26 @@ public class PerformanceMonitor {
     private static final Logger LOGGER = LoggerFactory.getLogger("OptiVisualPerf");
     private static final MinecraftClient client = MinecraftClient.getInstance();
 
-    private static float currentFPS = 60.0f;
     private static float smoothFPS = 60.0f;
-    private static int fpsCounter = 0;
-    private static int fpsFrames = 0;
     private static int adjustmentCooldown = 0;
     private static float lastChunkRenderTimeMs = 0.0f;
 
     private static boolean active = false;
-    private static int targetFPS = 60;
-    private static int minDist = 4;
-    private static int maxDist = 16;
+    private static int targetFPS = 150;
+    private static int minDist = 2;
+    private static int maxDist = 12;
+
+    private static float dynamicFogScale = 1.0f;
+    private static boolean dynamicFogEnabled = false;
 
     public static void refreshConfig() {
         ConfigData cfg = ConfigManager.getConfig();
         if (cfg != null) {
-            active = cfg.autoOptimize && cfg.dynamicRenderDistance;
-            targetFPS = cfg.targetFPS;
+            active = cfg.autoOptimize;
+            targetFPS = Math.max(30, cfg.targetFPS);
             minDist = cfg.minRenderDistance;
             maxDist = cfg.maxRenderDistance;
+            dynamicFogEnabled = cfg.dynamicFogDistance;
         } else {
             active = false;
         }
@@ -42,44 +43,76 @@ public class PerformanceMonitor {
         if (client.world == null) return;
         if (!active) return;
 
-        fpsCounter++;
-        fpsFrames++;
-
-        if (fpsFrames >= 50) {
-            float elapsedSeconds = fpsFrames / 60.0f;
-            float prevFPS = currentFPS;
-            currentFPS = fpsCounter / elapsedSeconds;
-            smoothFPS = smoothFPS * 0.9f + currentFPS * 0.1f;
-            fpsCounter = 0;
-            fpsFrames = 0;
-
-            if (adjustmentCooldown > 0) {
-                adjustmentCooldown--;
-                return;
-            }
-
-            if (Math.abs(prevFPS - currentFPS) > 0.5f) {
-                adjustRenderDistance();
-            }
+        float fps;
+        try {
+            fps = client.getCurrentFps();
+        } catch (Exception e) {
+            fps = smoothFPS;
         }
+
+        smoothFPS = smoothFPS * 0.9f + fps * 0.1f;
+
+        if (adjustmentCooldown > 0) {
+            adjustmentCooldown--;
+            return;
+        }
+
+        boolean changed = false;
+        changed |= adjustRenderDistance();
+        changed |= adjustFogDistance();
+        if (changed) adjustmentCooldown = 3;
     }
 
-    private static void adjustRenderDistance() {
+    private static boolean adjustRenderDistance() {
         int currentDistance = client.options.getViewDistance().getValue();
 
-        if (smoothFPS < targetFPS * 0.7f && currentDistance > minDist) {
+        if (smoothFPS < targetFPS * 0.75f && currentDistance > minDist) {
             int newDist = Math.max(currentDistance - 2, minDist);
             client.options.getViewDistance().setValue(newDist);
-            LOGGER.info("FPS {} < {}, дистанция: {} → {}",
+            LOGGER.info("FPS {} < {}, дист: {} → {}",
                 (int) smoothFPS, targetFPS, currentDistance, newDist);
-            adjustmentCooldown = 5;
-        } else if (smoothFPS > targetFPS * 1.3f && currentDistance < maxDist) {
+            return true;
+        } else if (smoothFPS > targetFPS * 1.2f && currentDistance < maxDist) {
             int newDist = Math.min(currentDistance + 1, maxDist);
             client.options.getViewDistance().setValue(newDist);
-            LOGGER.info("FPS {} > {}, дистанция: {} → {}",
+            LOGGER.info("FPS {} > {}, дист: {} → {}",
                 (int) smoothFPS, targetFPS, currentDistance, newDist);
-            adjustmentCooldown = 5;
+            return true;
         }
+        return false;
+    }
+
+    private static boolean adjustFogDistance() {
+        if (!dynamicFogEnabled) {
+            if (dynamicFogScale < 1.0f) {
+                dynamicFogScale = Math.min(1.0f, dynamicFogScale + 0.1f);
+                return true;
+            }
+            return false;
+        }
+
+        if (smoothFPS < targetFPS * 0.75f && dynamicFogScale > 0.15f) {
+            float prev = dynamicFogScale;
+            dynamicFogScale = Math.max(0.15f, dynamicFogScale - 0.08f);
+            LOGGER.info("FPS {} < {}, туман: {:.2f} → {:.2f}",
+                (int) smoothFPS, targetFPS, prev, dynamicFogScale);
+            return true;
+        } else if (smoothFPS > targetFPS * 1.2f && dynamicFogScale < 1.0f) {
+            float prev = dynamicFogScale;
+            dynamicFogScale = Math.min(1.0f, dynamicFogScale + 0.05f);
+            LOGGER.info("FPS {} > {}, туман: {:.2f} → {:.2f}",
+                (int) smoothFPS, targetFPS, prev, dynamicFogScale);
+            return true;
+        }
+        return false;
+    }
+
+    public static void resetDynamicFog() {
+        dynamicFogScale = 1.0f;
+    }
+
+    public static float getDynamicFogScale() {
+        return active && dynamicFogEnabled ? dynamicFogScale : 1.0f;
     }
 
     public static void setLastChunkRenderTimeMs(float ms) {
@@ -92,5 +125,9 @@ public class PerformanceMonitor {
 
     public static float getSmoothFPS() {
         return smoothFPS;
+    }
+
+    public static int getTargetFPS() {
+        return targetFPS;
     }
 }

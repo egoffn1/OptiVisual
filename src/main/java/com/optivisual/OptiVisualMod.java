@@ -4,11 +4,14 @@ import com.optivisual.commands.CommandRegistry;
 import com.optivisual.config.ConfigManager;
 import com.optivisual.config.ConfigScreen;
 import com.optivisual.render.HudOverlay;
+import com.optivisual.render.OptiVisualRenderManager;
+import com.optivisual.render.PerformanceMonitor;
 import com.optivisual.util.HardwareDetector;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
@@ -39,6 +42,12 @@ public class OptiVisualMod implements ClientModInitializer {
         HudRenderCallback.EVENT.register(new HudOverlay());
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.world != null) {
+                OptiVisualRenderManager.updateCameraFromClient(client);
+                PerformanceMonitor.refreshConfig();
+                PerformanceMonitor.tick();
+            }
+
             if (openConfigKey.wasPressed() && client.currentScreen == null) {
                 client.setScreen(ConfigScreen.create(client.currentScreen));
             }

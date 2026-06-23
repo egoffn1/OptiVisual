@@ -12,7 +12,7 @@ public class ConfigData {
     public float skyBrightness = 1.0f;
     public String preset = "balanced";
     public boolean autoOptimize = true;
-    public int targetFPS = 60;
+    public int targetFPS = 150;
     public float renderDistanceScale = 1.0f;
     public boolean smoothLighting = true;
     public boolean showFps = false;
@@ -23,6 +23,7 @@ public class ConfigData {
     public boolean behindCulling = true;
     public int lodDistance = 64;
     public boolean dynamicRenderDistance = true;
-    public int minRenderDistance = 4;
-    public int maxRenderDistance = 32;
+    public boolean dynamicFogDistance = true;
+    public int minRenderDistance = 2;
+    public int maxRenderDistance = 12;
 }

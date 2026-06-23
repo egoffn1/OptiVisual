@@ -16,6 +16,13 @@ public class OptiVisualRenderManager {
     public static boolean cullBehind = true;
     public static double cullMaxDistSq = (32 * 16) * (32 * 16);
 
+    public static void updateCameraFromClient(MinecraftClient mc) {
+        if (mc == null || mc.gameRenderer == null) return;
+        Camera camera = mc.gameRenderer.getCamera();
+        if (camera == null) return;
+        updateCamera(camera);
+    }
+
     public static void updateCamera(Camera camera) {
         if (camera == null) return;
         camX = camera.getPos().x;
