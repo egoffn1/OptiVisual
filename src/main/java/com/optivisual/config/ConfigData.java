@@ -22,8 +22,6 @@ public class ConfigData {
     public boolean smartCulling = true;
     public boolean behindCulling = true;
     public int lodDistance = 64;
-    public boolean chunkImpostors = false;
-    public int impostorDistance = 48;
     public boolean dynamicRenderDistance = true;
     public int minRenderDistance = 4;
     public int maxRenderDistance = 32;

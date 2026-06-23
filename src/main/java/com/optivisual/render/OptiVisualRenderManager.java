@@ -33,23 +33,22 @@ public class OptiVisualRenderManager {
         return cameraDirection;
     }
 
-    public static boolean isBoxBehindCamera(Box box) {
+    public static boolean isSectionBehindCamera(int sectionX, int sectionZ) {
         if (!cameraReady) return false;
 
-        double cx = (box.minX + box.maxX) * 0.5;
-        double cz = (box.minZ + box.maxZ) * 0.5;
+        double blockCenterX = sectionX * 16 + 8;
+        double blockCenterZ = sectionZ * 16 + 8;
 
-        double dx = cx - lastCameraPos.x;
-        double dz = cz - lastCameraPos.z;
+        double dx = blockCenterX - lastCameraPos.x;
+        double dz = blockCenterZ - lastCameraPos.z;
 
         double dot = dx * cameraDirection.x + dz * cameraDirection.z;
-
         return dot < -8.0;
     }
 
-    public static float getDistanceToChunk(int chunkX, int chunkZ) {
-        double dx = (chunkX * 16 + 8) - lastCameraPos.x;
-        double dz = (chunkZ * 16 + 8) - lastCameraPos.z;
-        return (float) Math.sqrt(dx * dx + dz * dz);
+    public static double getSectionDistanceSq(int sectionX, int sectionZ) {
+        double dx = (sectionX * 16 + 8) - lastCameraPos.x;
+        double dz = (sectionZ * 16 + 8) - lastCameraPos.z;
+        return dx * dx + dz * dz;
     }
 }

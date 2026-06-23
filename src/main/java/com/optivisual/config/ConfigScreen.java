@@ -93,11 +93,6 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Расстояние до упрощённого рендера (в блоках)"))
             .setSaveConsumer(v -> { config.lodDistance = v; config.preset = "custom"; }).build());
 
-        culling.addEntry(e.startBooleanToggle(Text.literal("Импостеры чанков"), config.chunkImpostors)
-            .setDefaultValue(false)
-            .setTooltip(Text.literal("Заменять дальние чанки на упрощённые картинки"))
-            .setSaveConsumer(v -> { config.chunkImpostors = v; config.preset = "custom"; }).build());
-
         ConfigCategory perf = builder.getOrCreateCategory(Text.literal("Производительность"));
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Авто-оптимизация"), config.autoOptimize)

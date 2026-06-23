@@ -64,7 +64,6 @@ public class ConfigManager {
                 config.smartCulling = true;
                 config.behindCulling = true;
                 config.lodDistance = 32;
-                config.chunkImpostors = false;
                 config.dynamicRenderDistance = true;
                 config.minRenderDistance = 2;
                 config.maxRenderDistance = 8;
@@ -83,7 +82,6 @@ public class ConfigManager {
                 config.smartCulling = true;
                 config.behindCulling = true;
                 config.lodDistance = 48;
-                config.chunkImpostors = false;
                 config.dynamicRenderDistance = true;
                 config.minRenderDistance = 4;
                 config.maxRenderDistance = 12;
@@ -102,7 +100,6 @@ public class ConfigManager {
                 config.smartCulling = true;
                 config.behindCulling = true;
                 config.lodDistance = 64;
-                config.chunkImpostors = false;
                 config.dynamicRenderDistance = false;
                 config.minRenderDistance = 8;
                 config.maxRenderDistance = 24;
@@ -121,7 +118,6 @@ public class ConfigManager {
                 config.smartCulling = false;
                 config.behindCulling = false;
                 config.lodDistance = 128;
-                config.chunkImpostors = false;
                 config.dynamicRenderDistance = false;
                 config.minRenderDistance = 12;
                 config.maxRenderDistance = 32;
@@ -142,7 +138,6 @@ public class ConfigManager {
                 config.smartCulling = true;
                 config.behindCulling = true;
                 config.lodDistance = 64;
-                config.chunkImpostors = false;
                 config.dynamicRenderDistance = true;
                 config.minRenderDistance = 4;
                 config.maxRenderDistance = 16;
