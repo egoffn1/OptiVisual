@@ -13,31 +13,45 @@ public class PerformanceMonitor {
     private static float currentFPS = 60.0f;
     private static float smoothFPS = 60.0f;
     private static int fpsCounter = 0;
-    private static long fpsTimer = 0L;
+    private static int fpsFrames = 0;
     private static int adjustmentCooldown = 0;
     private static float lastChunkRenderTimeMs = 0.0f;
 
-    public static void tick() {
-        if (client.world == null) return;
+    private static boolean active = false;
+    private static int targetFPS = 60;
+    private static int minDist = 4;
+    private static int maxDist = 16;
 
-        ConfigData config = ConfigManager.getConfig();
-        if (config == null || !config.autoOptimize || !config.dynamicRenderDistance) return;
-
-        fpsCounter++;
-        long now = System.currentTimeMillis();
-
-        if (fpsTimer == 0) {
-            fpsTimer = now;
-            return;
+    public static void refreshConfig() {
+        ConfigData cfg = ConfigManager.getConfig();
+        if (cfg != null) {
+            active = cfg.autoOptimize && cfg.dynamicRenderDistance;
+            targetFPS = cfg.targetFPS;
+            minDist = cfg.minRenderDistance;
+            maxDist = cfg.maxRenderDistance;
+        } else {
+            active = false;
         }
 
-        long delta = now - fpsTimer;
-        if (delta >= 1000) {
+        OptiVisualRenderManager.cullBehind = cfg != null && cfg.behindCulling;
+        double maxBlockDist = (cfg != null ? cfg.maxRenderDistance : 32) * 16;
+        OptiVisualRenderManager.cullMaxDistSq = maxBlockDist * maxBlockDist;
+    }
+
+    public static void tick() {
+        if (client.world == null) return;
+        if (!active) return;
+
+        fpsCounter++;
+        fpsFrames++;
+
+        if (fpsFrames >= 50) {
+            float elapsedSeconds = fpsFrames / 60.0f;
             float prevFPS = currentFPS;
-            currentFPS = (fpsCounter * 1000.0f) / delta;
+            currentFPS = fpsCounter / elapsedSeconds;
             smoothFPS = smoothFPS * 0.9f + currentFPS * 0.1f;
             fpsCounter = 0;
-            fpsTimer = now;
+            fpsFrames = 0;
 
             if (adjustmentCooldown > 0) {
                 adjustmentCooldown--;
@@ -45,23 +59,22 @@ public class PerformanceMonitor {
             }
 
             if (Math.abs(prevFPS - currentFPS) > 0.5f) {
-                adjustRenderDistance(config);
+                adjustRenderDistance();
             }
         }
     }
 
-    private static void adjustRenderDistance(ConfigData config) {
+    private static void adjustRenderDistance() {
         int currentDistance = client.options.getViewDistance().getValue();
-        int targetFPS = config.targetFPS;
 
-        if (smoothFPS < targetFPS * 0.7f && currentDistance > config.minRenderDistance) {
-            int newDist = Math.max(currentDistance - 2, config.minRenderDistance);
+        if (smoothFPS < targetFPS * 0.7f && currentDistance > minDist) {
+            int newDist = Math.max(currentDistance - 2, minDist);
             client.options.getViewDistance().setValue(newDist);
             LOGGER.info("FPS {} < {}, дистанция: {} → {}",
                 (int) smoothFPS, targetFPS, currentDistance, newDist);
             adjustmentCooldown = 5;
-        } else if (smoothFPS > targetFPS * 1.3f && currentDistance < config.maxRenderDistance) {
-            int newDist = Math.min(currentDistance + 1, config.maxRenderDistance);
+        } else if (smoothFPS > targetFPS * 1.3f && currentDistance < maxDist) {
+            int newDist = Math.min(currentDistance + 1, maxDist);
             client.options.getViewDistance().setValue(newDist);
             LOGGER.info("FPS {} > {}, дистанция: {} → {}",
                 (int) smoothFPS, targetFPS, currentDistance, newDist);
@@ -79,9 +92,5 @@ public class PerformanceMonitor {
 
     public static float getSmoothFPS() {
         return smoothFPS;
-    }
-
-    public static float getCurrentFPS() {
-        return currentFPS;
     }
 }

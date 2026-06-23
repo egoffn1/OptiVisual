@@ -2,6 +2,7 @@ package com.optivisual.mixins;
 
 import com.optivisual.config.ConfigManager;
 import com.optivisual.config.ConfigData;
+import com.optivisual.util.ModCompat;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
@@ -35,6 +36,7 @@ public class MixinBackgroundRenderer {
 
     @Inject(method = "applyFog", at = @At("RETURN"), cancellable = true)
     private static void onApplyFog(Camera camera, BackgroundRenderer.FogType fogType, Vector4f color, float viewDistance, boolean thickFog, float tickDelta, CallbackInfoReturnable<Fog> cir) {
+        if (ModCompat.DISABLED_FOG) return;
         if (MinecraftClient.getInstance().world == null) return;
         ConfigData config = ConfigManager.getConfig();
         if (config == null || !config.customFog) return;
@@ -70,6 +72,7 @@ public class MixinBackgroundRenderer {
 
     @Inject(method = "getFogColor", at = @At("RETURN"), cancellable = true)
     private static void onGetFogColor(Camera camera, float tickDelta, ClientWorld world, int skyColor, float rainGradient, CallbackInfoReturnable<Vector4f> cir) {
+        if (ModCompat.DISABLED_FOG) return;
         if (MinecraftClient.getInstance().world == null) return;
         ConfigData config = ConfigManager.getConfig();
         if (config == null || !config.customFog) return;

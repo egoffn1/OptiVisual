@@ -1,5 +1,6 @@
 package com.optivisual.config;
 
+import com.optivisual.util.ModCompat;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -44,6 +45,12 @@ public class ConfigScreen {
 
         ConfigCategory fog = builder.getOrCreateCategory(Text.literal("Туман"));
 
+        if (ModCompat.DISABLED_FOG) {
+            fog.addEntry(e.startTextDescription(
+                Text.literal("⚠ Sodium/Iris: настройки тумана отключены для совместимости")
+            ).build());
+        }
+
         fog.addEntry(e.startBooleanToggle(Text.literal("Кастомный туман"), config.customFog)
             .setDefaultValue(false)
             .setTooltip(Text.literal("Включить свои настройки тумана"))
@@ -64,34 +71,23 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Делает цвет тумана более насыщенным"))
             .setSaveConsumer(v -> { config.fogColorBoost = v; config.preset = "custom"; }).build());
 
-        ConfigCategory sky = builder.getOrCreateCategory(Text.literal("Небо"));
-
-        sky.addEntry(e.startBooleanToggle(Text.literal("Кастомное небо"), config.customSky)
-            .setDefaultValue(false)
-            .setTooltip(Text.literal("Включить свои настройки неба"))
-            .setSaveConsumer(v -> { config.customSky = v; config.preset = "custom"; }).build());
-
-        sky.addEntry(e.startFloatField(Text.literal("Яркость неба"), config.skyBrightness)
-            .setDefaultValue(1.0f).setMin(0.1f).setMax(2.0f)
-            .setTooltip(Text.literal("Яркость неба отдельно от общей"))
-            .setSaveConsumer(v -> { config.skyBrightness = v; config.preset = "custom"; }).build());
-
         ConfigCategory culling = builder.getOrCreateCategory(Text.literal("Оптимизация рендера"));
 
-        culling.addEntry(e.startBooleanToggle(Text.literal("Умный каллинг"), config.smartCulling)
-            .setDefaultValue(true)
-            .setTooltip(Text.literal("Не рендерить невидимые чанки"))
-            .setSaveConsumer(v -> { config.smartCulling = v; config.preset = "custom"; }).build());
+        if (ModCompat.DISABLED_CULLING) {
+            culling.addEntry(e.startTextDescription(
+                Text.literal("⚠ Sodium: каллинг управляется Sodium. Опции ниже могут не работать.")
+            ).build());
+        }
 
         culling.addEntry(e.startBooleanToggle(Text.literal("Каллинг сзади камеры"), config.behindCulling)
             .setDefaultValue(true)
             .setTooltip(Text.literal("Не рендерить чанки позади камеры"))
             .setSaveConsumer(v -> { config.behindCulling = v; config.preset = "custom"; }).build());
 
-        culling.addEntry(e.startIntField(Text.literal("Дистанция LOD"), config.lodDistance)
-            .setDefaultValue(64).setMin(16).setMax(256)
-            .setTooltip(Text.literal("Расстояние до упрощённого рендера (в блоках)"))
-            .setSaveConsumer(v -> { config.lodDistance = v; config.preset = "custom"; }).build());
+        culling.addEntry(e.startIntField(Text.literal("Макс. дистанция рендера (чанки)"), config.maxRenderDistance)
+            .setDefaultValue(16).setMin(2).setMax(32)
+            .setTooltip(Text.literal("Максимальная дистанция (в чанках)"))
+            .setSaveConsumer(v -> { config.maxRenderDistance = v; config.preset = "custom"; }).build());
 
         ConfigCategory perf = builder.getOrCreateCategory(Text.literal("Производительность"));
 

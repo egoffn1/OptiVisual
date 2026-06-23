@@ -1,36 +1,42 @@
 package com.optivisual.render;
 
-import com.optivisual.config.ConfigData;
-import com.optivisual.config.ConfigManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 
 public class OptiVisualRenderManager {
     private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static Vec3d lastCameraPos = Vec3d.ZERO;
-    private static Vec3d cameraDirection = new Vec3d(0, 0, -1);
+
+    private static double camX, camY, camZ;
+    private static double dirX, dirY, dirZ;
     private static boolean cameraReady = false;
+
+    private static float lastYaw = Float.NaN;
+    private static float lastPitch = Float.NaN;
+
+    public static boolean cullBehind = true;
+    public static double cullMaxDistSq = (32 * 16) * (32 * 16);
 
     public static void updateCamera(Camera camera) {
         if (camera == null) return;
-        lastCameraPos = camera.getPos();
+        camX = camera.getPos().x;
+        camY = camera.getPos().y;
+        camZ = camera.getPos().z;
+
         float yaw = camera.getYaw();
         float pitch = camera.getPitch();
-        double dirX = -Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
-        double dirY = -Math.sin(Math.toRadians(pitch));
-        double dirZ = Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch));
-        cameraDirection = new Vec3d(dirX, dirY, dirZ);
+
+        if (yaw == lastYaw && pitch == lastPitch && cameraReady) return;
+
+        lastYaw = yaw;
+        lastPitch = pitch;
+
+        double yawRad = Math.toRadians(yaw);
+        double pitchRad = Math.toRadians(pitch);
+        double cosPitch = Math.cos(pitchRad);
+        dirX = -Math.sin(yawRad) * cosPitch;
+        dirY = -Math.sin(pitchRad);
+        dirZ = Math.cos(yawRad) * cosPitch;
         cameraReady = true;
-    }
-
-    public static Vec3d getCameraPos() {
-        return lastCameraPos;
-    }
-
-    public static Vec3d getCameraDirection() {
-        return cameraDirection;
     }
 
     public static boolean isSectionBehindCamera(int sectionX, int sectionZ) {
@@ -39,16 +45,15 @@ public class OptiVisualRenderManager {
         double blockCenterX = sectionX * 16 + 8;
         double blockCenterZ = sectionZ * 16 + 8;
 
-        double dx = blockCenterX - lastCameraPos.x;
-        double dz = blockCenterZ - lastCameraPos.z;
+        double dx = blockCenterX - camX;
+        double dz = blockCenterZ - camZ;
 
-        double dot = dx * cameraDirection.x + dz * cameraDirection.z;
-        return dot < -8.0;
+        return (dx * dirX + dz * dirZ) < -8.0;
     }
 
     public static double getSectionDistanceSq(int sectionX, int sectionZ) {
-        double dx = (sectionX * 16 + 8) - lastCameraPos.x;
-        double dz = (sectionZ * 16 + 8) - lastCameraPos.z;
+        double dx = (sectionX * 16 + 8) - camX;
+        double dz = (sectionZ * 16 + 8) - camZ;
         return dx * dx + dz * dz;
     }
 }

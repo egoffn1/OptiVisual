@@ -1,7 +1,5 @@
 package com.optivisual.mixins;
 
-import com.optivisual.config.ConfigManager;
-import com.optivisual.config.ConfigData;
 import com.optivisual.render.OptiVisualRenderManager;
 import com.optivisual.render.PerformanceMonitor;
 import net.minecraft.client.MinecraftClient;
@@ -32,20 +30,15 @@ public class MixinWorldRenderer {
         if (MinecraftClient.getInstance().world == null) return;
 
         OptiVisualRenderManager.updateCamera(camera);
+        PerformanceMonitor.refreshConfig();
         PerformanceMonitor.tick();
 
-        ConfigData config = ConfigManager.getConfig();
-        if (config != null && config.showChunkRenderTime) {
-            optiVisual$renderStartTime = System.nanoTime();
-        }
+        optiVisual$renderStartTime = System.nanoTime();
     }
 
     @Inject(method = "renderMain", at = @At("RETURN"))
     private void onRenderMainEnd(FrameGraphBuilder frameGraphBuilder, Frustum frustum, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, Fog fog, boolean renderBlockOutline, boolean renderEntityOutlines, RenderTickCounter renderTickCounter, Profiler profiler, CallbackInfo ci) {
-        if (optiVisual$renderStartTime == 0L) return;
-
         long elapsed = System.nanoTime() - optiVisual$renderStartTime;
-        optiVisual$renderStartTime = 0L;
         optiVisual$frameCount++;
 
         if (optiVisual$frameCount % 30 == 0) {
