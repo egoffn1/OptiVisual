@@ -36,5 +36,12 @@ public class HudOverlay implements HudRenderCallback {
             drawContext.drawText(textRenderer, chunkText, 4, y, color, true);
             y += 10;
         }
+
+        if (config.showEntityCount) {
+            int count = PerformanceMonitor.getEntityCount();
+            String text = String.format("Сущности: %d", count);
+            drawContext.drawText(textRenderer, text, 4, y, 0xFF55AAFF, true);
+            y += 10;
+        }
     }
 }

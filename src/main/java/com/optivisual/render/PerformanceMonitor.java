@@ -22,6 +22,9 @@ public class PerformanceMonitor {
     private static float dynamicFogScale = 1.0f;
     private static boolean dynamicFogEnabled = false;
 
+    private static int entityCount = 0;
+    private static boolean dynamicEntityQuality = false;
+
     public static void refreshConfig() {
         ConfigData cfg = ConfigManager.getConfig();
         if (cfg != null) {
@@ -30,6 +33,11 @@ public class PerformanceMonitor {
             minDist = cfg.minRenderDistance;
             maxDist = cfg.maxRenderDistance;
             dynamicFogEnabled = cfg.dynamicFogDistance;
+            dynamicEntityQuality = cfg.dynamicEntityQuality;
+
+            OptiVisualRenderManager.cullEntityBehind = cfg.entityCullingEnabled && cfg.entityBehindCulling;
+            double maxEntityDist = cfg.entityCullingEnabled ? cfg.entityMaxRenderDistance : 256;
+            OptiVisualRenderManager.maxEntityDistSq = maxEntityDist * maxEntityDist;
         } else {
             active = false;
         }
@@ -41,6 +49,11 @@ public class PerformanceMonitor {
 
     public static void tick() {
         if (client.world == null) return;
+
+        if (client.world != null && (client.getCurrentFps() % 20 == 0)) {
+            entityCount = client.world.getRegularEntityCount();
+        }
+
         if (!active) return;
 
         float fps;
@@ -60,6 +73,7 @@ public class PerformanceMonitor {
         boolean changed = false;
         changed |= adjustRenderDistance();
         changed |= adjustFogDistance();
+        changed |= adjustEntityQuality();
         if (changed) adjustmentCooldown = 3;
     }
 
@@ -107,12 +121,34 @@ public class PerformanceMonitor {
         return false;
     }
 
+    private static boolean adjustEntityQuality() {
+        if (!dynamicEntityQuality) return false;
+
+        if (smoothFPS < targetFPS * 0.75f && entityCount > 20) {
+            double maxEntityDist = Math.max(8, OptiVisualRenderManager.maxEntityDistSq > 0
+                ? Math.sqrt(OptiVisualRenderManager.maxEntityDistSq) - 4
+                : 32);
+            OptiVisualRenderManager.maxEntityDistSq = maxEntityDist * maxEntityDist;
+            LOGGER.info("FPS {} < {}, сущностей: {}, дист сущностей снижена",
+                (int) smoothFPS, targetFPS, entityCount);
+            return true;
+        } else if (smoothFPS > targetFPS * 1.2f) {
+            OptiVisualRenderManager.maxEntityDistSq = 32 * 32;
+            return true;
+        }
+        return false;
+    }
+
     public static void resetDynamicFog() {
         dynamicFogScale = 1.0f;
     }
 
     public static float getDynamicFogScale() {
         return active && dynamicFogEnabled ? dynamicFogScale : 1.0f;
+    }
+
+    public static int getEntityCount() {
+        return entityCount;
     }
 
     public static void setLastChunkRenderTimeMs(float ms) {

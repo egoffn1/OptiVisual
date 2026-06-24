@@ -68,6 +68,10 @@ public class ConfigManager {
                 config.dynamicFogDistance = true;
                 config.minRenderDistance = 2;
                 config.maxRenderDistance = 6;
+                config.entityCullingEnabled = true;
+                config.entityBehindCulling = true;
+                config.entityMaxRenderDistance = 16;
+                config.dynamicEntityQuality = true;
                 config.targetFPS = 150;
                 config.autoOptimize = true;
             }
@@ -89,6 +93,10 @@ public class ConfigManager {
                 config.dynamicFogDistance = true;
                 config.minRenderDistance = 4;
                 config.maxRenderDistance = 10;
+                config.entityCullingEnabled = true;
+                config.entityBehindCulling = true;
+                config.entityMaxRenderDistance = 24;
+                config.dynamicEntityQuality = true;
                 config.targetFPS = 120;
                 config.autoOptimize = true;
             }
@@ -110,6 +118,10 @@ public class ConfigManager {
                 config.dynamicFogDistance = false;
                 config.minRenderDistance = 8;
                 config.maxRenderDistance = 18;
+                config.entityCullingEnabled = true;
+                config.entityBehindCulling = false;
+                config.entityMaxRenderDistance = 48;
+                config.dynamicEntityQuality = false;
                 config.targetFPS = 60;
                 config.autoOptimize = false;
             }
@@ -131,6 +143,10 @@ public class ConfigManager {
                 config.dynamicFogDistance = false;
                 config.minRenderDistance = 12;
                 config.maxRenderDistance = 32;
+                config.entityCullingEnabled = false;
+                config.entityBehindCulling = false;
+                config.entityMaxRenderDistance = 64;
+                config.dynamicEntityQuality = false;
                 config.targetFPS = 30;
                 config.autoOptimize = false;
             }
@@ -154,6 +170,10 @@ public class ConfigManager {
                 config.dynamicFogDistance = true;
                 config.minRenderDistance = 2;
                 config.maxRenderDistance = 12;
+                config.entityCullingEnabled = true;
+                config.entityBehindCulling = true;
+                config.entityMaxRenderDistance = 32;
+                config.dynamicEntityQuality = true;
                 config.targetFPS = 150;
                 config.autoOptimize = true;
             }

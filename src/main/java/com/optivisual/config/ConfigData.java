@@ -17,6 +17,7 @@ public class ConfigData {
     public boolean smoothLighting = true;
     public boolean showFps = false;
     public boolean showChunkRenderTime = false;
+    public boolean showEntityCount = false;
     public boolean fogColorBoost = false;
 
     public boolean smartCulling = true;
@@ -26,4 +27,10 @@ public class ConfigData {
     public boolean dynamicFogDistance = true;
     public int minRenderDistance = 2;
     public int maxRenderDistance = 12;
+
+    // Entity culling
+    public boolean entityCullingEnabled = true;
+    public boolean entityBehindCulling = true;
+    public int entityMaxRenderDistance = 32;
+    public boolean dynamicEntityQuality = true;
 }

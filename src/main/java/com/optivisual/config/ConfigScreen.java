@@ -19,7 +19,7 @@ public class ConfigScreen {
         if (ModCompat.HAS_SODIUM) {
             builder.getOrCreateCategory(Text.literal("Совместимость"))
                 .addEntry(e.startTextDescription(
-                    Text.literal("Sodium: всё работает. Fog/color через BackgroundRenderer, дистанция через options.")
+                    Text.literal("Sodium: всё работает. Entity culling через EntityRenderDispatcher.shouldRender.")
                 ).build());
         }
 
@@ -76,11 +76,11 @@ public class ConfigScreen {
 
         if (ModCompat.HAS_SODIUM) {
             culling.addEntry(e.startTextDescription(
-                Text.literal("Sodium управляет каллингом чанков. Настройки ниже работают только если Sodium не заменяет BuiltChunkStorage.")
+                Text.literal("Sodium управляет каллингом чанков. Entity каллинг через EntityRenderDispatcher.sharedRender — работает.")
             ).build());
         }
 
-        culling.addEntry(e.startBooleanToggle(Text.literal("Каллинг сзади камеры"), config.behindCulling)
+        culling.addEntry(e.startBooleanToggle(Text.literal("Каллинг сзади камеры (чанки)"), config.behindCulling)
             .setDefaultValue(true)
             .setTooltip(Text.literal("Не рендерить чанки позади камеры. Если Sodium — может не работать."))
             .setSaveConsumer(v -> { config.behindCulling = v; config.preset = "custom"; }).build());
@@ -90,11 +90,33 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Максимальная дистанция (в чанках)"))
             .setSaveConsumer(v -> { config.maxRenderDistance = v; config.preset = "custom"; }).build());
 
+        ConfigCategory entity = builder.getOrCreateCategory(Text.literal("Сущности"));
+
+        entity.addEntry(e.startBooleanToggle(Text.literal("Каллинг сущностей"), config.entityCullingEnabled)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Включить умное отсечение невидимых сущностей"))
+            .setSaveConsumer(v -> { config.entityCullingEnabled = v; config.preset = "custom"; }).build());
+
+        entity.addEntry(e.startBooleanToggle(Text.literal("Сзади камеры"), config.entityBehindCulling)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Не рендерить мобов/предметы позади камеры"))
+            .setSaveConsumer(v -> { config.entityBehindCulling = v; config.preset = "custom"; }).build());
+
+        entity.addEntry(e.startIntField(Text.literal("Макс. дистанция сущностей (блоки)"), config.entityMaxRenderDistance)
+            .setDefaultValue(32).setMin(4).setMax(128)
+            .setTooltip(Text.literal("Дальность, после которой мобы/предметы скрываются"))
+            .setSaveConsumer(v -> { config.entityMaxRenderDistance = v; config.preset = "custom"; }).build());
+
+        entity.addEntry(e.startBooleanToggle(Text.literal("Динам. качество сущностей"), config.dynamicEntityQuality)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Снижать дальность прорисовки сущностей при низком FPS"))
+            .setSaveConsumer(v -> { config.dynamicEntityQuality = v; config.preset = "custom"; }).build());
+
         ConfigCategory perf = builder.getOrCreateCategory(Text.literal("Производительность"));
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Авто-оптимизация"), config.autoOptimize)
             .setDefaultValue(true)
-            .setTooltip(Text.literal("Автоматически подбирать дистанцию рендера и туман под FPS"))
+            .setTooltip(Text.literal("Автоматически подбирать дистанцию рендера, туман и сущностей под FPS"))
             .setSaveConsumer(v -> { config.autoOptimize = v; config.preset = "custom"; }).build());
 
         perf.addEntry(e.startIntField(Text.literal("Целевой FPS"), config.targetFPS)
@@ -112,14 +134,14 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Снижать дальность тумана при низком FPS для ускорения"))
             .setSaveConsumer(v -> { config.dynamicFogDistance = v; config.preset = "custom"; }).build());
 
-        perf.addEntry(e.startIntField(Text.literal("Мин. дистанция рендера"), config.minRenderDistance)
+        perf.addEntry(e.startIntField(Text.literal("Мин. дистанция рендера (чанки)"), config.minRenderDistance)
             .setDefaultValue(2).setMin(2).setMax(32)
-            .setTooltip(Text.literal("Минимальная дистанция (в чанках)"))
+            .setTooltip(Text.literal("Минимальная дистанция прорисовки (в чанках)"))
             .setSaveConsumer(v -> { config.minRenderDistance = v; config.preset = "custom"; }).build());
 
-        perf.addEntry(e.startIntField(Text.literal("Макс. дистанция рендера"), config.maxRenderDistance)
+        perf.addEntry(e.startIntField(Text.literal("Макс. дистанция рендера (чанки)"), config.maxRenderDistance)
             .setDefaultValue(12).setMin(2).setMax(32)
-            .setTooltip(Text.literal("Максимальная дистанция (в чанках)"))
+            .setTooltip(Text.literal("Максимальная дистанция прорисовки (в чанках)"))
             .setSaveConsumer(v -> { config.maxRenderDistance = v; config.preset = "custom"; }).build());
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Показать FPS"), config.showFps)
@@ -131,6 +153,11 @@ public class ConfigScreen {
             .setDefaultValue(false)
             .setTooltip(Text.literal("Показывать время рендера чанков (мс). С Sodium может не работать."))
             .setSaveConsumer(v -> { config.showChunkRenderTime = v; config.preset = "custom"; }).build());
+
+        perf.addEntry(e.startBooleanToggle(Text.literal("Кол-во сущностей на экране"), config.showEntityCount)
+            .setDefaultValue(false)
+            .setTooltip(Text.literal("Показывать число отрендеренных сущностей"))
+            .setSaveConsumer(v -> { config.showEntityCount = v; config.preset = "custom"; }).build());
 
         ConfigCategory presets = builder.getOrCreateCategory(Text.literal("Пресеты"));
 

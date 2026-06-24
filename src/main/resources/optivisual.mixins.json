@@ -6,7 +6,8 @@
   "client": [
     "MixinBackgroundRenderer",
     "MixinWorldRenderer",
-    "MixinBuiltChunkStorage"
+    "MixinBuiltChunkStorage",
+    "MixinEntityRenderDispatcher"
   ],
   "injectors": {
     "defaultRequire": 1

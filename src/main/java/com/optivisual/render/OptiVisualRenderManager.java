@@ -2,6 +2,7 @@ package com.optivisual.render;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
+import net.minecraft.entity.Entity;
 
 public class OptiVisualRenderManager {
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -13,8 +14,14 @@ public class OptiVisualRenderManager {
     private static float lastYaw = Float.NaN;
     private static float lastPitch = Float.NaN;
 
+    // Chunk culling
     public static boolean cullBehind = true;
     public static double cullMaxDistSq = (32 * 16) * (32 * 16);
+
+    // Entity culling
+    public static boolean cullEntityBehind = true;
+    public static double maxEntityDistSq = 32 * 32;
+    public static int renderedEntityCount = 0;
 
     public static void updateCameraFromClient(MinecraftClient mc) {
         if (mc == null || mc.gameRenderer == null) return;
@@ -46,6 +53,8 @@ public class OptiVisualRenderManager {
         cameraReady = true;
     }
 
+    // ==================== Chunk culling ====================
+
     public static boolean isSectionBehindCamera(int sectionX, int sectionZ) {
         if (!cameraReady) return false;
 
@@ -63,4 +72,22 @@ public class OptiVisualRenderManager {
         double dz = (sectionZ * 16 + 8) - camZ;
         return dx * dx + dz * dz;
     }
+
+    // ==================== Entity culling ====================
+
+    public static boolean isEntityBehindCamera(Entity entity) {
+        if (!cameraReady) return false;
+        double dx = entity.getX() - camX;
+        double dz = entity.getZ() - camZ;
+        return (dx * dirX + dz * dirZ) < -2.0;
+    }
+
+    public static double getEntityDistanceSq(Entity entity) {
+        double dx = entity.getX() - camX;
+        double dz = entity.getZ() - camZ;
+        return dx * dx + dz * dz;
+    }
+
+    public static double getCamX() { return camX; }
+    public static double getCamZ() { return camZ; }
 }
