@@ -33,6 +33,8 @@ public class ConfigData {
     public boolean entityBehindCulling = true;
     public int entityMaxRenderDistance = 32;
     public boolean dynamicEntityQuality = true;
+    public boolean entityLodEnabled = true;
+    public int entityLodThreshold = 16;
 
     // Lazy HUD
     public boolean lazyHud = true;

@@ -72,6 +72,8 @@ public class ConfigManager {
                 config.entityBehindCulling = true;
                 config.entityMaxRenderDistance = 16;
                 config.dynamicEntityQuality = true;
+                config.entityLodEnabled = true;
+                config.entityLodThreshold = 8;
                 config.lazyHud = true;
                 config.targetFPS = 150;
                 config.autoOptimize = true;
@@ -98,6 +100,8 @@ public class ConfigManager {
                 config.entityBehindCulling = true;
                 config.entityMaxRenderDistance = 24;
                 config.dynamicEntityQuality = true;
+                config.entityLodEnabled = true;
+                config.entityLodThreshold = 12;
                 config.lazyHud = true;
                 config.targetFPS = 120;
                 config.autoOptimize = true;
@@ -124,6 +128,8 @@ public class ConfigManager {
                 config.entityBehindCulling = false;
                 config.entityMaxRenderDistance = 48;
                 config.dynamicEntityQuality = false;
+                config.entityLodEnabled = true;
+                config.entityLodThreshold = 24;
                 config.lazyHud = false;
                 config.targetFPS = 60;
                 config.autoOptimize = false;
@@ -150,6 +156,8 @@ public class ConfigManager {
                 config.entityBehindCulling = false;
                 config.entityMaxRenderDistance = 64;
                 config.dynamicEntityQuality = false;
+                config.entityLodEnabled = false;
+                config.entityLodThreshold = 32;
                 config.lazyHud = false;
                 config.targetFPS = 30;
                 config.autoOptimize = false;
@@ -178,6 +186,8 @@ public class ConfigManager {
                 config.entityBehindCulling = true;
                 config.entityMaxRenderDistance = 32;
                 config.dynamicEntityQuality = true;
+                config.entityLodEnabled = true;
+                config.entityLodThreshold = 16;
                 config.lazyHud = true;
                 config.targetFPS = 150;
                 config.autoOptimize = true;

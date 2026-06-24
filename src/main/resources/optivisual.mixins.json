@@ -8,7 +8,8 @@
     "MixinWorldRenderer",
     "MixinBuiltChunkStorage",
     "MixinEntityRenderDispatcher",
-    "MixinInGameHud"
+    "MixinInGameHud",
+    "MixinLivingEntityRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

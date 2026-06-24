@@ -112,6 +112,16 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Снижать дальность прорисовки сущностей при низком FPS"))
             .setSaveConsumer(v -> { config.dynamicEntityQuality = v; config.preset = "custom"; }).build());
 
+        entity.addEntry(e.startBooleanToggle(Text.literal("LOD сущностей"), config.entityLodEnabled)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Уменьшать модель и отключать анимацию у дальних мобов"))
+            .setSaveConsumer(v -> { config.entityLodEnabled = v; config.preset = "custom"; }).build());
+
+        entity.addEntry(e.startIntField(Text.literal("Порог LOD (блоки)"), config.entityLodThreshold)
+            .setDefaultValue(16).setMin(4).setMax(128)
+            .setTooltip(Text.literal("Дальность, после которой мобы начинают упрощаться"))
+            .setSaveConsumer(v -> { config.entityLodThreshold = v; config.preset = "custom"; }).build());
+
         ConfigCategory perf = builder.getOrCreateCategory(Text.literal("Производительность"));
 
         perf.addEntry(e.startBooleanToggle(Text.literal("Авто-оптимизация"), config.autoOptimize)
