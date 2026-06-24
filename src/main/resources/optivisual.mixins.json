@@ -7,7 +7,8 @@
     "MixinBackgroundRenderer",
     "MixinWorldRenderer",
     "MixinBuiltChunkStorage",
-    "MixinEntityRenderDispatcher"
+    "MixinEntityRenderDispatcher",
+    "MixinInGameHud"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -23,6 +23,7 @@ public class PerformanceMonitor {
     private static boolean dynamicFogEnabled = false;
 
     private static int entityCount = 0;
+    private static int entityUpdateCounter = 0;
     private static boolean dynamicEntityQuality = false;
 
     public static void refreshConfig() {
@@ -50,7 +51,7 @@ public class PerformanceMonitor {
     public static void tick() {
         if (client.world == null) return;
 
-        if (client.world != null && (client.getCurrentFps() % 20 == 0)) {
+        if (++entityUpdateCounter % 10 == 0) {
             entityCount = client.world.getRegularEntityCount();
         }
 

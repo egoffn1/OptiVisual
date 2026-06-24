@@ -159,6 +159,11 @@ public class ConfigScreen {
             .setTooltip(Text.literal("Показывать число отрендеренных сущностей"))
             .setSaveConsumer(v -> { config.showEntityCount = v; config.preset = "custom"; }).build());
 
+        perf.addEntry(e.startBooleanToggle(Text.literal("Ленивый HUD"), config.lazyHud)
+            .setDefaultValue(true)
+            .setTooltip(Text.literal("Обновлять HUD не каждый кадр, а по очереди (здоровье→еда→XP). Экономит CPU."))
+            .setSaveConsumer(v -> { config.lazyHud = v; config.preset = "custom"; }).build());
+
         ConfigCategory presets = builder.getOrCreateCategory(Text.literal("Пресеты"));
 
         presets.addEntry(e.startSelector(
